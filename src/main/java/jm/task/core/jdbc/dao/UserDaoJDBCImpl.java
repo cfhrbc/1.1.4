@@ -10,57 +10,99 @@ import java.util.List;
 public class UserDaoJDBCImpl implements UserDao {
     private final Connection connection;
 
-    public UserDaoJDBCImpl() throws SQLException {
+    public UserDaoJDBCImpl() {
         this.connection = Util.getConnection();
 
     }
 
     public void createUsersTable() {
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
             String query = "CREATE TABLE IF NOT EXISTS users (" +
                     "id BIGINT PRIMARY KEY AUTO_INCREMENT," +
                     "name VARCHAR(50) NOT NULL," +
                     "lastName VARCHAR(50) NOT NULL," +
                     "age TINYINT NOT NULL)";
             statement.executeUpdate(query);
+            connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
     public void dropUsersTable() {
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
             String query = "DROP TABLE IF EXISTS users";
             statement.executeUpdate(query);
+            connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
     public void saveUser(String name, String lastName, byte age) {
         String query = "INSERT INTO users (name, lastName, age) VALUES (?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            connection.setAutoCommit(false);
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setByte(3, age);
             preparedStatement.executeUpdate();
+            connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
     public void removeUserById(long id) {
         String query = "DELETE FROM users WHERE id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setLong(1, id);
+            connection.setAutoCommit(false);
             preparedStatement.executeUpdate();
+            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
-
     }
 
     public List<User> getAllUsers() {
@@ -82,17 +124,19 @@ public class UserDaoJDBCImpl implements UserDao {
         return userList;
     }
 
-
-
-
-
     public void cleanUsersTable() {
         try (Statement statement = connection.createStatement()) {
             String query = "TRUNCATE TABLE users";
+            connection.setAutoCommit(false);
             statement.executeUpdate(query);
+            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
-
     }
 }

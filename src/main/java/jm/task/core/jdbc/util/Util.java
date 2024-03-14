@@ -10,7 +10,13 @@ public class Util {
     private static final String PASSWORD = "root";
 
 
-    public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+    public static Connection getConnection() {
+        Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        } catch (SQLException e) {
+            System.err.println("Ошибка при установлении соединения с базой данных: " + e.getMessage());
+        }
+        return connection;
     }
 }
