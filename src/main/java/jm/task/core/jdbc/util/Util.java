@@ -15,10 +15,8 @@ public class Util {
     private static final String JDBC_URL = "jdbc:mysql://localhost:4444/task_1";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "root";
-    private static final SessionFactory sessionFactory = buildSessionFactory();
 
-
-    private static SessionFactory buildSessionFactory() {
+    public static SessionFactory getSessionFactory() {
         try {
             Configuration configuration = new Configuration();
 
@@ -31,7 +29,7 @@ public class Util {
 
             configuration.setProperty(Environment.DIALECT, "org.hibernate.dialect.MySQLDialect");
             configuration.setProperty("hibernate.show_sql", "true");
-            configuration.setProperty("hibernate.hbm2ddl.auto", "none");
+            configuration.setProperty(Environment.HBM2DDL_AUTO, "");
 
 
             configuration.addAnnotatedClass(User.class);
@@ -44,10 +42,6 @@ public class Util {
             System.out.println("Initial SessionFactory creation failed." + ex);
             throw new ExceptionInInitializerError(ex);
         }
-    }
-
-    public static SessionFactory getSessionFactory() {
-        return sessionFactory;
     }
 
 
